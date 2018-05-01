@@ -1,6 +1,7 @@
 package com.example.android.chat;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -9,15 +10,20 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
+import android.widget.Toast;
+
 
 import java.util.ArrayList;
 
-public class ChatActivity extends AppCompatActivity {
+public class ChatActivity extends AppCompatActivity implements ChatAdaptor.OnClickListener {
 
     private ArrayList<MessageItem> messages;
     private ChatAdaptor adaptor;
     private RecyclerView myRecyclerView;
+    MessageFragment messageFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,11 +41,13 @@ public class ChatActivity extends AppCompatActivity {
         messages = new ArrayList<MessageItem>();
 
         // create and attach adaptor
-        adaptor = new ChatAdaptor(messages);
+        adaptor = new ChatAdaptor(messages, this);
         myRecyclerView.setAdapter(adaptor);
 
         // set the layout manager to arrange the items
         myRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+
 
     }
 
@@ -62,6 +70,11 @@ public class ChatActivity extends AppCompatActivity {
         editText.setText("");
     }
 
+    /**
+     * Make keyboard disappear when user clicks on screen
+     * @param event
+     * @return
+     */
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
 
@@ -82,5 +95,25 @@ public class ChatActivity extends AppCompatActivity {
             }
         }
         return ret;
+    }
+
+    @Override
+    public void onClick(MessageItem message){
+        System.out.println("ChatActivity:: onClick");
+        Toast.makeText(getBaseContext(), " On click func from ChatActivity", Toast.LENGTH_SHORT).show();
+        messageFragment = new MessageFragment();
+        getSupportFragmentManager().beginTransaction().add(R.id.activity_chat_frame, messageFragment).commit();
+    }
+
+    public void removeMessage(View view){
+        if (messageFragment != null){
+            messageFragment.removeMessage();
+        }
+    }
+
+    public void shareMessage(View view){
+        if (messageFragment != null){
+            messageFragment.shareMessage();
+        }
     }
 }
